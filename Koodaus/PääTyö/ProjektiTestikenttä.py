@@ -21,13 +21,14 @@ class Player:
             self.visa_value = result['VisaArvo']
             self.garbage_weight = result['RepunPaino']
             self.high_score = result['EnnätysPisteet']
-            self.countries_visited = set(result['Sijainti'].split(','))
+            self.countries_visited = result['Kohteet']
         else:
-            self.location = "Suomi"
+            self.location = "Albania"
             self.points = 0
             self.visa_value = 0
             self.garbage_weight = 0
             self.high_score = 0
+            self.countries_visited = ''
             self.save_to_db()
 
     def save_to_db(self):
@@ -73,13 +74,22 @@ class Player:
 
     def collect_item(self, item_id):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM esineidenarvo WHERE EsineID = %s", (item_id,))
+        cursor.execute(f"SELECT * FROM esineidenarvo WHERE EsineID = '{item_id}'")
         item = cursor.fetchone()
 
         if item:
             self.visa_value += item['Arvo']
             self.points += 10
-            self.countries_visited.add(item['MaaNimi'])
+
+            print(item['MaaNimi'])
+
+            if self.countries_visited == '':
+                self.countries_visited = self.countries_visited + item['MaaNimi']
+            else:
+                self.countries_visited = self.countries_visited + ',' + item['MaaNimi']
+
+            print(self.countries_visited)
+
             self.update_db()
             return item
         return None
@@ -153,7 +163,7 @@ def main():
             print(f"Visa-arvo: {status['visa_value']:.2f}")
             print(f"Roskien paino: {status['garbage_weight']:.2f} kg")
             print(f"Ennätys: {status['high_score']}")
-            print(f"Vieraillut maat: {', '.join(status['countries_visited'])}")
+            print(f"Vieraillut maat: {status['countries_visited']}")
 
         elif action == "paluu suomeen":
             if player.return_to_finland():
