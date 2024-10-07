@@ -3,6 +3,14 @@ import random
 import geopy.distance
 from geopy.distance import great_circle as GRC
 
+conn = mysql.connector.connect(
+        host='localhost',
+        port=3306,
+        database='flight_game',
+        user='Veikko',
+        password='SQLTemp',
+        autocommit=True
+    )
 
 class Player:
     def __init__(self, name, conn):
@@ -34,16 +42,16 @@ class Player:
     def save_to_db(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "INSERT INTO pelaajantiedot (Nimi, Sijainti, Pisteet, VisaArvo, RepunPaino) VALUES (%s, %s, %s, %s, %s)",
-            (self.name, self.location, self.points, self.visa_value, self.garbage_weight)
+            "INSERT INTO pelaajantiedot (Nimi, Sijainti, Kohteet, Pisteet, VisaArvo, RepunPaino) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.name, self.location, self.countries_visited, self.points, self.visa_value, self.garbage_weight)
         )
         self.conn.commit()
 
     def update_db(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "UPDATE pelaajantiedot SET Pisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
-            (self.points, self.visa_value, self.garbage_weight, self.name)
+            "UPDATE pelaajantiedot SET Kohteet = %s, Pisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
+            (self.countries_visited, self.points, self.visa_value, self.garbage_weight, self.name)
         )
         self.conn.commit()
 
@@ -86,7 +94,7 @@ class Player:
             if self.countries_visited == '':
                 self.countries_visited = self.countries_visited + item['MaaNimi']
             else:
-                self.countries_visited = self.countries_visited + ',' + item['MaaNimi']
+                self.countries_visited = self.countries_visited + ', ' + item['MaaNimi']
 
             print(self.countries_visited)
 
@@ -103,8 +111,14 @@ class Player:
         return False
 
     def return_to_finland(self):
-        if self.visa_value >= 100 and self.garbage_weight == 0:
-            self.location = "Suomi"
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute(f"SELECT maanlisätiedot.PääsyArvo as Arvo FROM maanlisätiedot WHERE maanlisätiedot.iso_country = 'FI'")
+        item = cursor.fetchone()
+
+        print(item['Arvo'])
+
+        if self.visa_value >= item['Arvo'] and self.garbage_weight == 0:
+            self.location = "Finland"
             self.update_db()
             return True
         return False
@@ -117,19 +131,11 @@ class Player:
             "visa_value": self.visa_value,
             "garbage_weight": self.garbage_weight,
             "high_score": self.high_score,
-            "countries_visited": list(self.countries_visited)
+            "countries_visited": self.countries_visited
         }
 
 
 def main():
-    conn = mysql.connector.connect(
-        host='localhost',
-        port=3306,
-        database='flight_game',
-        user='Veikko',
-        password='SQLTemp',
-        autocommit=True
-    )
 
     player_name = input("Syötä pelaajan nimi: ")
     player = Player(player_name, conn)
