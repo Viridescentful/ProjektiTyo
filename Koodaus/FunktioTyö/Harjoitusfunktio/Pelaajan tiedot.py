@@ -1,5 +1,7 @@
 import mysql.connector
 import random
+import geopy.distance
+from geopy.distance import great_circle as GRC
 
 
 class Player:
@@ -51,10 +53,7 @@ class Player:
 
     def travel_to_country(self, country_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT iso_country, ArvoEsine FROM maanlisätiedot WHERE iso_country = %s",
-            (country_name,)
-        )
+        cursor.execute(f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
         result = cursor.fetchone()
 
         if result:
@@ -116,9 +115,9 @@ def main():
     conn = mysql.connector.connect(
         host='localhost',
         port=3306,
-        database='demogame',
-        user='ava',
-        password='ava123',
+        database='flight_game',
+        user='Veikko',
+        password='SQLTemp',
         autocommit=True
     )
 
