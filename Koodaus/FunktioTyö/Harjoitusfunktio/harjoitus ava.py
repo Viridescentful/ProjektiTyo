@@ -89,18 +89,19 @@ class Player:
     def tarkista_saavutettavat_lentokentat(self):
         print("Tarkistetaan saavutettavat lentokentät...")  # Debug print
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM airport")
+        cursor.execute("SELECT airport.ident as ident FROM airport, maanlisätiedot WHERE maanlisätiedot.ICAO = airport.ident")
         lentokentät = cursor.fetchall()
 
         saavutettavat_maat = []
+
         for lentokenttä in lentokentät:
-            cursor.execute("SELECT * FROM maanlisätiedot WHERE iso_country = %s", (lentokenttä['iso_country'],))
+            cursor.execute("SELECT * FROM maanlisätiedot WHERE ICAO = %s", (lentokenttä['ident'],))
             maa_tieto = cursor.fetchone()
 
             etäisyys = random.randint(5, 30)
             if etäisyys <= 900 and maa_tieto:
-                kierrätyspaikka = maa_tieto.get('kierrätyspaikka', 0)  # Default value 0 if not found
-                saavutettavat_maat.append((maa_tieto['iso_country'], maa_tieto['ArvoEsine'], kierrätyspaikka))
+                saavutettavat_maat.append((maa_tieto['iso_country'], maa_tieto['PääsyArvo'], maa_tieto['Kierratyspaikka']))
+
 
         return saavutettavat_maat
 
@@ -109,9 +110,9 @@ def main():
     conn = mysql.connector.connect(
         host='localhost',
         port=3306,
-        database='demogame',  # Use 'demogame' database
-        user='ava',
-        password='ava123',
+        database='flight_game',
+        user='Veikko',
+        password='SQLTemp',
         autocommit=True
     )
 
@@ -143,7 +144,12 @@ def main():
             if saavutettavat_maat:
                 print("Saatavilla olevat maat:")
                 for maa in saavutettavat_maat:
-                    print(f"Maa: {maa[0]} (ArvoEsine: {maa[1]}, Kierrätyspaikka: {maa[2]})")
+                    kierrätysarvo = "Ei"
+
+                    if maa[2] == 1:
+                        kierrätysarvo = "On"
+
+                    print(f"Maa: {maa[0]} (Tarvittava Arvo: {maa[1]}, Kierrätyspaikka: {kierrätysarvo})")
 
                 country = input("Syötä matkustettavan maan ISO-koodi: ")
                 if player.travel_to_country(country):
