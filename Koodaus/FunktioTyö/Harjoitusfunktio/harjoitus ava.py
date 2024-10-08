@@ -125,9 +125,8 @@ def main():
         action = input("Valitse toiminto (kerää esine, tyhjennä roskat, matkusta): ").lower()
 
         if action == "kerää esine":
-            item_id = random.randint(1, 33)  # Assuming items are ID 1-33
             cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM esineidenarvo WHERE EsineID = %s", (item_id,))
+            cursor.execute(f"SELECT * FROM esineidenarvo, maanlisätiedot WHERE esineidenarvo.EsineID = maanlisätiedot.ArvoEsine AND maanlisätiedot.iso_country = '{player.location}'")
             item = cursor.fetchone()
             if item:
                 player.collect_item(item)
