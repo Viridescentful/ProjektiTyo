@@ -32,6 +32,22 @@ def paivitysfunktio(nimi):
 
     return vastaus
 
+@app.route('/lento/<nimi>')
+def lentofunktio(nimi):
+    uusipelaaja = Pelaaja(nimi, db.conn)
+
+    vastaus = uusipelaaja.annatiedot()
+
+    return vastaus
+
+@app.route('/tyhjennaroskat/<nimi>')
+def roskafunktio(nimi):
+    uusipelaaja = Pelaaja(nimi, db.conn)
+
+    vastaus = uusipelaaja.annatiedot()
+
+    return vastaus
+
 
 if __name__ == '__main__':
     app.run(use_reloader=True, host='127.0.0.1', port=5000)
