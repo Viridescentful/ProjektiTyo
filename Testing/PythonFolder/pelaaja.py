@@ -5,6 +5,7 @@ from geopy.distance import great_circle as GRC
 
 import json
 
+
 class Pelaaja:
     def __init__(self, name, conn):
         self.name = name
@@ -43,8 +44,8 @@ class Pelaaja:
     def update_db(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "UPDATE pelaajantiedot SET Kohteet = %s, Pisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
-            (self.countries_visited, self.points, self.visa_value, self.garbage_weight, self.name)
+            "UPDATE pelaajantiedot SET Kohteet = %s, Sijainti = %s, Pisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
+            (self.countries_visited, self.location, self.points, self.visa_value, self.garbage_weight, self.name)
         )
         self.conn.commit()
 
@@ -55,3 +56,79 @@ class Pelaaja:
         result = cursor.fetchone()
 
         return result
+
+    def calculate_flight_frequency(self):
+        max_frequency = 100
+        frequency = max(0, max_frequency - (self.garbage_weight * 0.5))
+        return frequency
+
+    def travel_to_country(self, country_name):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute(
+            f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine, maanlisätiedot.Roska_KG as Roska FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
+        result = cursor.fetchone()
+
+        if result:
+            distance = random.randint(5, 30)
+            frequency = self.calculate_flight_frequency()
+
+            if distance <= frequency:
+                self.location = country_name
+                self.garbage_weight += result['Roska']
+                self.update_db()
+
+                if self.collect_item(result['ArvoEsine']):
+                    return {
+                        "arvoesine": result['ArvoEsine'],
+                        "maanimi": result['country_name'],
+                        "status": "Onnistui"
+                    }
+                else:
+                    return {
+                        "arvoesine": "Keratty",
+                        "maanimi": result['country_name'],
+                        "status": "Onnistui"
+                    }
+
+
+            else:
+                return {
+                    "arvoesine": "Ei",
+                    "maanimi": result['country_name'],
+                    "status": "Epaonnistui"
+                }
+        else:
+            return {
+                "arvoesine": "Ei",
+                "maanimi": "Ei",
+                "status": "Epaonnistui"
+            }
+
+    def collect_item(self, item_id):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute(f"SELECT * FROM esineidenarvo WHERE EsineID = '{item_id}'")
+        item = cursor.fetchone()
+
+        if item:
+            countries = self.countries_visited.split()
+
+            if item['MaaNimi'] in countries:
+                return False
+            else:
+                self.visa_value += item['Arvo']
+                self.points += 10
+
+                print(item['MaaNimi'])
+
+                if self.countries_visited == '':
+                    self.countries_visited = self.countries_visited + item['MaaNimi']
+                else:
+                    self.countries_visited = self.countries_visited + ' ' + item['MaaNimi']
+
+                print(self.countries_visited)
+
+                self.update_db()
+
+                return True
+        else:
+            return False

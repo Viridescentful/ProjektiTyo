@@ -4,7 +4,7 @@ import geopy.distance
 from geopy.distance import great_circle as GRC
 
 import json
-from flask import Flask
+from flask import Flask, request
 from database import Database
 from pelaaja import Pelaaja
 from flask_cors import CORS
@@ -15,7 +15,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/aloitapeli/<nimi>')
-def aloitapeli(nimi): #127.0.0.1:5000/aloitapeli
+def aloitapeli(nimi): #127.0.0.1:5000/aloitapeli/Veikko
     uusipelaaja = Pelaaja(nimi, db.conn)
 
     vastaus = {
@@ -25,18 +25,21 @@ def aloitapeli(nimi): #127.0.0.1:5000/aloitapeli
     return vastaus
 
 @app.route('/paivitatiedot/<nimi>')
-def paivitysfunktio(nimi):
+def paivitysfunktio(nimi): #127.0.0.1:5000/paivitatiedot/Veikko
     uusipelaaja = Pelaaja(nimi, db.conn)
 
     vastaus = uusipelaaja.annatiedot()
 
     return vastaus
 
-@app.route('/lento/<nimi>')
-def lentofunktio(nimi):
-    uusipelaaja = Pelaaja(nimi, db.conn)
+@app.route('/lento')
+def lentofunktio(): #127.0.0.1:5000/lento?name=Veikko&maa=Germany
+    args = request.args
 
-    vastaus = uusipelaaja.annatiedot()
+    print(args.get("name"), args.get("maa"))
+
+    uusipelaaja = Pelaaja(args.get("name"), db.conn)
+    vastaus = uusipelaaja.travel_to_country(args.get("maa"))
 
     return vastaus
 
