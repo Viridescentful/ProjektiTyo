@@ -57,6 +57,25 @@ class Pelaaja:
 
         return result
 
+    def tyhjennaroskat(self):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute(f"SELECT maanlisätiedot.Kierratyspaikka as kierratyspaikka FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{self.location}'")
+        result = cursor.fetchone()
+
+        if result:
+            if result['kierratyspaikka'] == 1:
+                self.garbage_weight = 0
+
+                return {
+                    "roskamaara": self.garbage_weight,
+                    "status": "Onnistui"
+                }
+
+        return {
+            "roskamaara": self.garbage_weight,
+            "status": "Epaonnistui"
+        }
+
     def calculate_flight_frequency(self):
         max_frequency = 100
         frequency = max(0, max_frequency - (self.garbage_weight * 0.5))
