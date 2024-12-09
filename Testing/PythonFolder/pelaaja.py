@@ -36,16 +36,16 @@ class Pelaaja:
     def save_to_db(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "INSERT INTO pelaajantiedot (Nimi, Sijainti, Kohteet, Pisteet, VisaArvo, RepunPaino) VALUES (%s, %s, %s, %s, %s, %s)",
-            (self.name, self.location, self.countries_visited, self.points, self.visa_value, self.garbage_weight)
+            "INSERT INTO pelaajantiedot (Nimi, Sijainti, Kohteet, Pisteet, EnnätysPisteet, VisaArvo, RepunPaino) VALUES (%s, %s, %s, %s, %s, %s)",
+            (self.name, self.location, self.countries_visited, self.points, self.high_score, self.visa_value, self.garbage_weight)
         )
         self.conn.commit()
 
     def update_db(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "UPDATE pelaajantiedot SET Kohteet = %s, Sijainti = %s, Pisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
-            (self.countries_visited, self.location, self.points, self.visa_value, self.garbage_weight, self.name)
+            "UPDATE pelaajantiedot SET Kohteet = %s, Sijainti = %s, Pisteet = %s, EnnätysPisteet = %s, VisaArvo = %s, RepunPaino = %s WHERE Nimi = %s",
+            (self.countries_visited, self.location, self.points, self.high_score, self.visa_value, self.garbage_weight, self.name)
         )
         self.conn.commit()
 
@@ -57,6 +57,34 @@ class Pelaaja:
 
         return result
 
+    def tyhjennatiedot(self):
+        self.location = "Albania"
+        self.points = 0
+        self.visa_value = 0
+        self.garbage_weight = 0
+        self.countries_visited = ''
+
+        self.update_db()
+
+    def paluusuomeen(self):
+        cursor = self.conn.cursor(dictionary=True)
+        cursor.execute(
+            f"SELECT maanlisätiedot.PääsyArvo as Arvo FROM maanlisätiedot WHERE maanlisätiedot.iso_country = 'FI'")
+        item = cursor.fetchone()
+
+        if self.visa_value >= item['Arvo'] and self.garbage_weight == 0:
+            self.location = "Finland"
+            self.points += 250
+
+            if self.high_score < self.points:
+                self.high_score = self.points
+
+            self.tyhjennatiedot()
+
+            return True
+
+        return False
+
     def tyhjennaroskat(self):
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute(f"SELECT maanlisätiedot.Kierratyspaikka as kierratyspaikka FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{self.location}'")
@@ -65,6 +93,7 @@ class Pelaaja:
         if result:
             if result['kierratyspaikka'] == 1:
                 self.garbage_weight = 0
+                self.update_db()
 
                 return {
                     "roskamaara": self.garbage_weight,
@@ -76,10 +105,6 @@ class Pelaaja:
             "status": "Epaonnistui"
         }
 
-    def calculate_flight_frequency(self):
-        max_frequency = 100
-        frequency = max(0, max_frequency - (self.garbage_weight * 0.5))
-        return frequency
 
     def travel_to_country(self, country_name):
         cursor = self.conn.cursor(dictionary=True)
@@ -89,7 +114,7 @@ class Pelaaja:
 
         if result:
             distance = random.randint(5, 30)
-            frequency = self.calculate_flight_frequency()
+            frequency = 100
 
             if distance <= frequency:
                 self.location = country_name

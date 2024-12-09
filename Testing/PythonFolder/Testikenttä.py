@@ -69,5 +69,19 @@ def kaikkimaattfunktio(): #127.0.0.1:5000/kaikkimaat
 
     return result
 
+@app.route('/paluusuomeen/<nimi>')
+def lopetusfunktio(nimi): #127.0.0.1:5000/paluusuomeen/Veikko
+    uusipelaaja = Pelaaja(nimi, db.conn)
+    vastaus = uusipelaaja.paluusuomeen()
+
+    return vastaus
+
+@app.route('/lopetapeli/<nimi>')
+def lopetusfunktio(nimi): #127.0.0.1:5000/lopetapeli/Veikko
+    uusipelaaja = Pelaaja(nimi, db.conn)
+    uusipelaaja.tyhjennatiedot()
+
+    return "Tiedot Tyhjennetty"
+
 if __name__ == '__main__':
     app.run(use_reloader=True, host='127.0.0.1', port=5000)
