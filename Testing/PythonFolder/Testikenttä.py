@@ -44,7 +44,7 @@ def lentofunktio(): #127.0.0.1:5000/lento?name=Veikko&maa=Germany
     return vastaus
 
 @app.route('/tyhjennaroskat/<nimi>')
-def roskafunktio(nimi):
+def roskafunktio(nimi): #127.0.0.1:5000/tyhjennaroskat/Veikko
     uusipelaaja = Pelaaja(nimi, db.conn)
 
     vastaus = uusipelaaja.annatiedot()
@@ -52,7 +52,7 @@ def roskafunktio(nimi):
     return vastaus
 
 @app.route('/maantiedot/<maa>')
-def maantiedotfunktio(maa):
+def maantiedotfunktio(maa): #127.0.0.1:5000/maantiedot/Germany
     cursor = db.conn.cursor(dictionary=True)
     cursor.execute(
         f"SELECT country.iso_country as maaiso, country.name as maanimi, maanlisätiedot.ArvoEsine as arvoesine, maanlisätiedot.Roska_KG as roska, airport.latitude_deg as lat, airport.longitude_deg as lon FROM maanlisätiedot, country, airport WHERE maanlisätiedot.iso_country = country.iso_country AND airport.ident = maanlisätiedot.ICAO AND country.name = '{maa}'")
@@ -61,7 +61,7 @@ def maantiedotfunktio(maa):
     return result
 
 @app.route('/kaikkimaat')
-def kaikkimaattfunktio():
+def kaikkimaattfunktio(): #127.0.0.1:5000/kaikkimaat
     cursor = db.conn.cursor(dictionary=True)
     cursor.execute(
         f"SELECT country.iso_country as maaiso, country.name as maanimi, maanlisätiedot.ArvoEsine as arvoesine, maanlisätiedot.Roska_KG as roska, airport.latitude_deg as lat, airport.longitude_deg as lon FROM maanlisätiedot LEFT JOIN country ON maanlisätiedot.iso_country = country.iso_country LEFT JOIN airport ON airport.ident = maanlisätiedot.ICAO")
