@@ -88,21 +88,28 @@ class Player:
         item = cursor.fetchone()
 
         if item:
-            self.visa_value += item['Arvo']
-            self.points += 10
+            countries = self.countries_visited.split()
 
-            print(item['MaaNimi'])
-
-            if self.countries_visited == '':
-                self.countries_visited = self.countries_visited + item['MaaNimi']
+            if item['MaaNimi'] in countries:
+                return None
             else:
-                self.countries_visited = self.countries_visited + ', ' + item['MaaNimi']
+                self.visa_value += item['Arvo']
+                self.points += 10
 
-            print(self.countries_visited)
+                print(item['MaaNimi'])
 
-            self.update_db()
-            return item
-        return None
+                if self.countries_visited == '':
+                    self.countries_visited = self.countries_visited + item['MaaNimi']
+                else:
+                    self.countries_visited = self.countries_visited + ' ' + item['MaaNimi']
+
+                print(self.countries_visited)
+
+                self.update_db()
+
+                return item
+
+
 
     def dispose_garbage(self):
         if self.garbage_weight > 0:

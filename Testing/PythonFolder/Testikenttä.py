@@ -51,6 +51,23 @@ def roskafunktio(nimi):
 
     return vastaus
 
+@app.route('/maantiedot/<maa>')
+def maantiedotfunktio(maa):
+    cursor = db.conn.cursor(dictionary=True)
+    cursor.execute(
+        f"SELECT country.iso_country as maaiso, country.name as maanimi, maanlisätiedot.ArvoEsine as arvoesine, maanlisätiedot.Roska_KG as roska, airport.latitude_deg as lat, airport.longitude_deg as lon FROM maanlisätiedot, country, airport WHERE maanlisätiedot.iso_country = country.iso_country AND airport.ident = maanlisätiedot.ICAO AND country.name = '{maa}'")
+    result = cursor.fetchone()
+
+    return result
+
+@app.route('/kaikkimaat')
+def kaikkimaattfunktio():
+    cursor = db.conn.cursor(dictionary=True)
+    cursor.execute(
+        f"SELECT country.iso_country as maaiso, country.name as maanimi, maanlisätiedot.ArvoEsine as arvoesine, maanlisätiedot.Roska_KG as roska, airport.latitude_deg as lat, airport.longitude_deg as lon FROM maanlisätiedot LEFT JOIN country ON maanlisätiedot.iso_country = country.iso_country LEFT JOIN airport ON airport.ident = maanlisätiedot.ICAO")
+    result = cursor.fetchall()
+
+    return result
 
 if __name__ == '__main__':
     app.run(use_reloader=True, host='127.0.0.1', port=5000)

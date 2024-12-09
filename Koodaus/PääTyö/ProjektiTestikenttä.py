@@ -55,6 +55,10 @@ class Player:
         )
         self.conn.commit()
 
+    def fetchdistance(self, lon, lan):
+        print("Hello")
+
+
     def calculate_flight_frequency(self):
         max_frequency = 100
         frequency = max(0, max_frequency - (self.garbage_weight * 0.5))
@@ -62,16 +66,16 @@ class Player:
 
     def travel_to_country(self, country_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
+        cursor.execute(f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine, maanlisätiedot.Roska_KG as Roska FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
         result = cursor.fetchone()
 
         if result:
             distance = random.randint(5, 30)
             frequency = self.calculate_flight_frequency()
 
-            if self.garbage_weight + distance <= frequency:
+            if distance <= frequency:
                 self.location = country_name
-                self.garbage_weight += distance
+                self.garbage_weight += result['Roska']
                 self.update_db()
                 return result['ArvoEsine']
             else:
