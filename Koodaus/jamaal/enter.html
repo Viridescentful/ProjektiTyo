@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Your Name</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+    <h1>Tuliaisia Suomeen!</h1>
+    <p>Laita nimesi laatikkoon ja aloita peli!</p>
+    <form id="nameForm">
+        <input type="text" id="nameInput" placeholder="Your Name" required>
+        <a href="index.html">Aloita</a>
+    </form>
+
+    <script>
+        document.getElementById('nameForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting normally
+
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                // Redirect to the other HTML file
+                window.location.href = 'map.html';
+            } else {
+                alert('Please enter your name before proceeding.');
+            }
+        });
+    </script>
+</body>
+</html>

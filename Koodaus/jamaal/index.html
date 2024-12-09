@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tuliaisia Suomeen!</title>
+    <!-- Leaflet Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="pj.css">
+    <!-- Leaflet Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Custom Script -->
+    <script src="example.js" defer></script>
+</head>
+<body>
+<div id="map" style="width: 100%; height: 500px;"></div>
+<!-- Forms -->
+<form id="single">
+    <input name="icao" placeholder="laita lentokentän ICAO koodi">
+    <input type="submit" value="Etsi">
+</form>
+<form id="list-selection">
+    <select id="countries">
+        <option>Valitse maa</option>
+    </select>
+    <select id="airports">
+        <option>Valitse lentokenttä</option>
+    </select>
+</form>
+
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([54.5260, 15.2551], 4); // Center of Europe
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+</script>
+</body>
+</html>
+
