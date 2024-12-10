@@ -8,7 +8,7 @@ let currentMarker;
 let map;
 
 function initializeMap(lat, lon) {
-    map = L.map('map').setView([lat, lon], 4);
+    map = L.map('map').setView([lat, lon], 8);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
