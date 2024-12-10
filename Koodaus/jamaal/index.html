@@ -24,12 +24,14 @@
     <input type="submit" value="Etsi">
 </form>
 <form id="list-selection">
-    <select id="countries">
-        <option>Valitse maa</option>
-    </select>
-    <select id="airports">
-        <option>Valitse lentokenttä</option>
-    </select>
+    <p><strong>Nimi:</strong> <span id="name-output"></span></p>
+    <p><strong>Roskamäärä:</strong> <span id="trash-output"></span></p>
+    <p><strong>Sijainti:</strong> <span id="location-output"></span></p>
+    <div class="button-container">
+        <p><button>Tyhjennä Roskat</button></p>
+        <p><button>Paluu Suomeen</button></p>
+    </div>
+
 </form>
 
 <script>
