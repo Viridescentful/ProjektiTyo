@@ -108,8 +108,7 @@ class Pelaaja:
 
     def travel_to_country(self, country_name):
         cursor = self.conn.cursor(dictionary=True)
-        cursor.execute(
-            f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine, maanlisätiedot.Roska_KG as Roska FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
+        cursor.execute(f"SELECT maanlisätiedot.iso_country as lisäiso, country.iso_country as countryiso, country.name as country_name, maanlisätiedot.ArvoEsine as ArvoEsine, maanlisätiedot.Roska_KG as Roska FROM maanlisätiedot, country WHERE maanlisätiedot.iso_country = country.iso_country AND country.name = '{country_name}'")
         result = cursor.fetchone()
 
         if result:

@@ -34,7 +34,7 @@ $('#startGameBtn').on('click', function() {
         localStorage.setItem('playerName', playerName);
     }
 
-    $.get(`/aloitapeli/${playerName}`, function(data) {
+    $.get(`http://127.0.0.1:5000/aloitapeli/${playerName}`, function(data) {
         $('#name-output').text(data["Pelaajan Nimi"]);
         visaValue = 0;
         trashWeight = 0;
@@ -50,7 +50,7 @@ $('#travelBtn').on('click', function() {
 
     if (!countryName) return;
 
-    $.get(`/maantiedot/${countryName}`, function(data) {
+    $.get(`http://127.0.0.1:5000/maantiedot/${countryName}`, function(data) {
         if (!data) {
             alert("Maa ei löytynyt. Yritä uudelleen.");
             return;
@@ -68,7 +68,7 @@ $('#travelBtn').on('click', function() {
         if (visaValue >= 100) {
             let travelHome = confirm("Visa-arvosi on 100. Haluatko matkustaa Suomeen?");
             if (travelHome) {
-                $.get(`/paluusuomeen/${playerName}`, function() {
+                $.get(`http://127.0.0.1:5000/paluusuomeen/${playerName}`, function() {
                     alert("Olet palannut Suomeen!");
                     visaValue = 0;
                     trashWeight = 0;
@@ -89,7 +89,7 @@ $('#travelBtn').on('click', function() {
 $('#collectSouvenirBtn').on('click', function() {
     let collect = confirm("Haluatko kerätä matkamuiston?");
     if (collect) {
-        $.get(`/lento?name=${playerName}&maa=${currentLocation}`, function(data) {
+        $.get(`http://127.0.0.1:5000/lento?name=${playerName}&maa=${currentLocation}`, function(data) {
             visaValue += data.arvoesine;
             $('#souvenir-info').text(`Keräsit matkamuiston: ${data.arvoesine} arvosta!`);
             updateGameInfo();
@@ -103,7 +103,7 @@ $('#collectSouvenirBtn').on('click', function() {
 });
 
 $('#endGameBtn').on('click', function() {
-    $.get(`/lopetapeli/${playerName}`, function() {
+    $.get(`http://127.0.0.1:5000/lopetapeli/${playerName}`, function() {
         alert("Peli päättyi. Tiedot on tyhjennetty.");
         visaValue = 0;
         trashWeight = 0;
