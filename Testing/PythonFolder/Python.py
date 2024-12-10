@@ -3,14 +3,12 @@ import random
 import geopy.distance
 from geopy.distance import great_circle as GRC
 
-conn = mysql.connector.connect(
-        host='localhost',
-        port=3306,
-        database='flight_game',
-        user='Veikko',
-        password='SQLTemp',
-        autocommit=True
-    )
+import json
+from flask import Flask
+from database import Database
+from flask_cors import CORS
+
+db = Database()
 
 class Player:
     def __init__(self, name, conn):
@@ -90,21 +88,28 @@ class Player:
         item = cursor.fetchone()
 
         if item:
-            self.visa_value += item['Arvo']
-            self.points += 10
+            countries = self.countries_visited.split()
 
-            print(item['MaaNimi'])
-
-            if self.countries_visited == '':
-                self.countries_visited = self.countries_visited + item['MaaNimi']
+            if item['MaaNimi'] in countries:
+                return None
             else:
-                self.countries_visited = self.countries_visited + ', ' + item['MaaNimi']
+                self.visa_value += item['Arvo']
+                self.points += 10
 
-            print(self.countries_visited)
+                print(item['MaaNimi'])
 
-            self.update_db()
-            return item
-        return None
+                if self.countries_visited == '':
+                    self.countries_visited = self.countries_visited + item['MaaNimi']
+                else:
+                    self.countries_visited = self.countries_visited + ' ' + item['MaaNimi']
+
+                print(self.countries_visited)
+
+                self.update_db()
+
+                return item
+
+
 
     def dispose_garbage(self):
         if self.garbage_weight > 0:
@@ -140,9 +145,8 @@ class Player:
 
 
 def main():
-
     player_name = input("Syötä pelaajan nimi: ")
-    player = Player(player_name, conn)
+    player = Player(player_name, db.conn)
 
     while True:
         action = input("\nValitse toiminto (matkusta, tyhjennä roskat, näytä tiedot, paluu Suomeen, lopeta): ").lower()
@@ -189,8 +193,6 @@ def main():
         else:
             print("Tuntematon toiminto.")
 
-    conn.close()
-
-
+    db.conn.close()
 if __name__ == "__main__":
     main()
