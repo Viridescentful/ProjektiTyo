@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tuliaisia Suomeen!</title>
+    <!-- Leaflet Styles -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="pj.css">
+    <!-- Leaflet Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Custom Script -->
+    <script src="game.js" defer></script>
+</head>
+<body>
+<div id="map" style="width: 100%; height: 500px;"></div>
+<!-- Forms -->
+<form id="single">
+    <button id="travelBtn">Matkusta</button>
+</form>
+<form id="list-selection">
+    <p><strong>Nimi:</strong> <span id="name-output"></span></p>
+    <p><strong>Roskamäärä:</strong> <span id="trash-output"></span></p>
+    <p><strong>Sijainti:</strong> <span id="location-output"></span></p>
+    <div class="button-container">
+        <button id="trashbutton">Tyhjennä Roskat</button>
+        <button id="returnbutton">Paluu Suomeen</button>
+    </div>
+
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</body>
+</html>
+

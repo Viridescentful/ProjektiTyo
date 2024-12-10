@@ -1,0 +1,23 @@
+body {
+    font-family: "Arial Rounded MT Bold";
+    text-align: center;
+    font-size: 200%;
+
+
+
+
+}
+a    {
+    display: inline-block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: white;
+    background-color: black;
+    border: 2px solid white;
+    border-radius: 4px;
+    font-size: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+
+
+}
