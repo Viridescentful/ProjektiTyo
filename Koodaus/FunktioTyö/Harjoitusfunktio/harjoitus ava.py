@@ -20,7 +20,7 @@ class Player:
             self.garbage_weight = result['RepunPaino']
             self.high_score = result['EnnätysPisteet']
         else:
-            self.location = "Suomi"
+            self.location = "AL"
             self.points = 0
             self.visa_value = 0
             self.garbage_weight = 0
@@ -51,13 +51,13 @@ class Player:
 
     def collect_item(self, item):
         self.visa_value += item['Arvo']
-        self.points += 10  # Bonus points for collecting an item
+        self.points += 10
         self.update_db()
 
     def dispose_garbage(self):
         if self.garbage_weight > 0:
             self.garbage_weight = 0
-            self.points += 5  # Points for disposing of garbage
+            self.points += 5
             self.update_db()
             return True
         return False
@@ -78,16 +78,16 @@ class Player:
         result = cursor.fetchone()
 
         if result:
-            distance = random.randint(5, 30)  # Simulated travel distance
-            if self.garbage_weight + distance <= 100:  # Max garbage weight
+            distance = random.randint(5, 30)
+            if self.garbage_weight + distance <= 100:
                 self.location = country
-                self.garbage_weight += distance  # Increase garbage weight
+                self.garbage_weight += distance
                 self.update_db()
                 return True
         return False
 
     def tarkista_saavutettavat_lentokentat(self):
-        print("Tarkistetaan saavutettavat lentokentät...")  # Debug print
+        print("Tarkistetaan saavutettavat lentokentät...")
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("SELECT airport.ident as ident FROM airport, maanlisätiedot WHERE maanlisätiedot.ICAO = airport.ident")
         lentokentät = cursor.fetchall()
@@ -110,9 +110,9 @@ def main():
     conn = mysql.connector.connect(
         host='localhost',
         port=3306,
-        database='flight_game',
-        user='Veikko',
-        password='SQLTemp',
+        database='demogame',
+        user='ava',
+        password='ava123',
         autocommit=True
     )
 
