@@ -78,16 +78,16 @@ class Player:
         result = cursor.fetchone()
 
         if result:
-            distance = random.randint(5, 30)  # Simulated travel distance
-            if self.garbage_weight + distance <= 100:  # Max garbage weight
+            distance = random.randint(5, 30)
+            if self.garbage_weight + distance <= 100:
                 self.location = country
-                self.garbage_weight += distance  # Increase garbage weight
+                self.garbage_weight += distance
                 self.update_db()
                 return True
         return False
 
     def tarkista_saavutettavat_lentokentat(self):
-        print("Tarkistetaan saavutettavat lentokentät...")  # Debug print
+        print("Tarkistetaan saavutettavat lentokentät...")
         cursor = self.conn.cursor(dictionary=True)
         cursor.execute("SELECT airport.ident as ident FROM airport, maanlisätiedot WHERE maanlisätiedot.ICAO = airport.ident")
         lentokentät = cursor.fetchall()
