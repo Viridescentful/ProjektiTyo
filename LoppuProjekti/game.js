@@ -7,7 +7,6 @@ let currentLocation = 'Albania';
 let currentMarker;
 let map;
 
-
 function initializeMap(lat, lon) {
     map = L.map('map').setView([lat, lon], 4);
 
@@ -20,17 +19,23 @@ function initializeMap(lat, lon) {
 }
 
 function updateGameInfo() {
-    $('#visa-value').text(`Visa-arvo: ${visaValue}`);
-    $('#backpack-status').text(`Reppu: ${trashWeight} kg Roskaa`);
-    $('#location').text(`Nykyinen sijainti: ${currentLocation}`);
+    $('#name-output').text(playerName);
+    $('#trash-output').text(`${trashWeight} kg Roskaa`);
+    $('#location-output').text(currentLocation);
 }
 
+
 $('#startGameBtn').on('click', function() {
-    playerName = prompt("Syötä nimesi:");
-    if (!playerName) return;
+    playerName = localStorage.getItem('playerName');
+
+    if (!playerName) {
+        playerName = prompt("Syötä nimesi:");
+        if (!playerName) return;
+        localStorage.setItem('playerName', playerName);
+    }
 
     $.get(`/aloitapeli/${playerName}`, function(data) {
-        $('#player-name').text(`Pelaaja: ${data["Pelaajan Nimi"]}`);
+        $('#name-output').text(data["Pelaajan Nimi"]);
         visaValue = 0;
         trashWeight = 0;
         currentLocation = 'Finland';
@@ -41,11 +46,16 @@ $('#startGameBtn').on('click', function() {
 });
 
 $('#travelBtn').on('click', function() {
-    let icaoCode = prompt("Syötä Maan nimi, johon haluat matkustaa:");
+    let countryName = prompt("Syötä Maan nimi, johon haluat matkustaa:");
 
-    if (!icaoCode) return;
+    if (!countryName) return;
 
-    $.get(`/maantiedot/${icaoCode}`, function(data) {
+    $.get(`/maantiedot/${countryName}`, function(data) {
+        if (!data) {
+            alert("Maa ei löytynyt. Yritä uudelleen.");
+            return;
+        }
+
         currentLocation = data.maanimi;
         visaValue += data.arvoesine;
         trashWeight += data.roska;
@@ -71,41 +81,53 @@ $('#travelBtn').on('click', function() {
         } else {
             $('#collectSouvenirBtn').show();
         }
+    }).fail(function() {
+        alert("Virhe tiedon hakemisessa. Yritä myöhemmin.");
     });
 });
 
 $('#collectSouvenirBtn').on('click', function() {
     let collect = confirm("Haluatko kerätä matkamuiston?");
-
     if (collect) {
-
         $.get(`/lento?name=${playerName}&maa=${currentLocation}`, function(data) {
             visaValue += data.arvoesine;
             $('#souvenir-info').text(`Keräsit matkamuiston: ${data.arvoesine} arvosta!`);
             updateGameInfo();
             $('#collectSouvenirBtn').hide();
+        }).fail(function() {
+            alert("Virhe matkamuiston keräämisessä. Yritä myöhemmin.");
         });
     } else {
         $('#collectSouvenirBtn').hide();
     }
 });
 
-// Lopeta peli
 $('#endGameBtn').on('click', function() {
     $.get(`/lopetapeli/${playerName}`, function() {
         alert("Peli päättyi. Tiedot on tyhjennetty.");
         visaValue = 0;
         trashWeight = 0;
         currentLocation = 'Albania';
-        currentMarker.setLatLng([60.1699, 24.9384]); // Suomi
-        map.setView([60.1699, 24.9384], 4);
+        currentMarker.setLatLng([41.3275, 19.8189]);
+        map.setView([41.3275, 19.8189], 4);
         updateGameInfo();
+
+        localStorage.removeItem('playerName');
+    }).fail(function() {
+        alert("Virhe pelin lopettamisessa. Yritä myöhemmin.");
     });
 });
 
-// Alustetaan kartta ja pelitiedot
 $(document).ready(function() {
-    // Muutetaan aloituspaikka Tiranaksi, Albania
-    initializeMap(41.3275, 19.8189); // Tirana, Albania
+    initializeMap(41.3275, 19.8189);
+
+    playerName = localStorage.getItem('playerName');
+
+    if (playerName) {
+        $('#name-output').text(playerName);
+    } else {
+        $('#name-output').text("Tuntematon pelaaja");
+    }
+
     updateGameInfo();
 });
