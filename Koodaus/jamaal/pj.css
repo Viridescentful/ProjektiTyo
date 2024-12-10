@@ -35,3 +35,8 @@ select {
     padding: .5rem;
     margin-bottom: .3rem;
 }
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
